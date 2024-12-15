@@ -3,6 +3,7 @@ package export
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"net"
 	"strings"
@@ -69,11 +70,12 @@ func GetMultipleCertInfo(records []provider.GetRecordCertReq) ([]provider.Record
 func GetCertInfo(record provider.GetRecordCertReq) (certInfo provider.RecordCert, err error) {
 	config := &tls.Config{
 		InsecureSkipVerify: true,
+		ServerName:         record.FullRecord,
 	}
 	d := net.Dialer{
 		Timeout: time.Second * 3,
 	}
-	conn, err := tls.DialWithDialer(&d, "tcp", record.FullRecord+":443", config)
+	conn, err := tls.DialWithDialer(&d, "tcp", record.RecordValue+":443", config)
 	if err != nil {
 		return certInfo, err
 	}
@@ -91,7 +93,8 @@ func GetCertInfo(record provider.GetRecordCertReq) (certInfo provider.RecordCert
 
 	cert := certs[0]
 	certInfo.SubjectCommonName = cert.Subject.CommonName
-	if strings.Contains(certInfo.SubjectCommonName, record.DomainName) {
+	certInfo.IssuerCommonName = cert.Issuer.CommonName
+	if strings.Contains(certInfo.SubjectCommonName, record.DomainName) || checkCertMatched(record, cert) {
 		certInfo.CertMatched = true
 	} else {
 		certInfo.CertMatched = false
@@ -103,8 +106,6 @@ func GetCertInfo(record provider.GetRecordCertReq) (certInfo provider.RecordCert
 	if len(cert.Subject.OrganizationalUnit) > 0 {
 		certInfo.SubjectOrganizationalUnit = cert.Subject.OrganizationalUnit[0]
 	}
-	// 从证书中提取颁发者信息
-	certInfo.IssuerCommonName = cert.Issuer.CommonName
 	if len(cert.Issuer.Organization) > 0 {
 		certInfo.IssuerOrganization = cert.Issuer.Organization[0]
 	}
@@ -135,7 +136,7 @@ func getNewRecord(records []provider.Record) (newRecords []provider.Record) {
 				rec.FullRecord = strings.ReplaceAll(rec.FullRecord, "*", "a")
 			}
 			if (rec.RecordType == "A" || rec.RecordType == "CNAME") &&
-				rec.RecordStatus == "enable" && isPortOpen(rec.FullRecord) {
+				rec.RecordStatus == "enable" && isPortOpen(rec.RecordValue) {
 				recordChan <- rec
 			}
 		}(record)
@@ -159,4 +160,15 @@ func isPortOpen(domain string) bool {
 	}
 	defer conn.Close()
 	return true
+}
+
+// checkCertMatched 检查证书是否匹配
+// https://github.com/opsre/cloud_dns_exporter/issues/25
+func checkCertMatched(record provider.GetRecordCertReq, cert *x509.Certificate) bool {
+	for _, name := range cert.DNSNames {
+		if strings.Contains(name, record.DomainName) {
+			return true
+		}
+	}
+	return false
 }

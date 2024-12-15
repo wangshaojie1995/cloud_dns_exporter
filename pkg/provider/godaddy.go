@@ -101,6 +101,7 @@ func (g *GodaddyDNS) ListRecords() ([]Record, error) {
 	}
 	results := make(map[string][]daddy.DNSRecord)
 	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
 	for _, domain := range domains {
 		wg.Add(1)
 		go func(domain string) {
@@ -125,7 +126,7 @@ func (g *GodaddyDNS) ListRecords() ([]Record, error) {
 				CloudProvider: g.account.CloudProvider,
 				CloudName:     g.account.CloudName,
 				DomainName:    domain,
-				RecordID:      v.Data,
+				RecordID:      public.GetID(),
 				RecordType:    v.Type,
 				RecordName:    v.Name,
 				RecordValue:   v.Data,

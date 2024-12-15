@@ -100,6 +100,7 @@ func (d *DNSLaDNS) ListRecords() ([]Record, error) {
 	}
 	results := make(map[string][]dnsla.Record)
 	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
 	for _, domain := range domains {
 		wg.Add(1)
 		go func(domainName, domainId string) {
@@ -124,7 +125,7 @@ func (d *DNSLaDNS) ListRecords() ([]Record, error) {
 				CloudProvider: d.account.CloudProvider,
 				CloudName:     d.account.CloudName,
 				DomainName:    domain,
-				RecordID:      v.Data,
+				RecordID:      public.GetID(),
 				RecordType:    getRecordType(v.Type),
 				RecordName:    v.DisplayHost,
 				RecordValue:   v.Data,
