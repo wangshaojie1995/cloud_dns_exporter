@@ -1,8 +1,6 @@
 module github.com/eryajf/cloud_dns_exporter
 
-go 1.22
-
-toolchain go1.22.4
+go 1.25
 
 require (
 	github.com/alibabacloud-go/alidns-20150109/v4 v4.5.5
@@ -17,15 +15,15 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/route53domains v1.25.6
 	github.com/charmbracelet/log v0.2.2
 	github.com/cloudflare/cloudflare-go v0.103.0
+	github.com/dromara/carbon/v2 v2.6.15
 	github.com/go-resty/resty/v2 v2.14.0
-	github.com/golang-module/carbon/v2 v2.3.12
 	github.com/prometheus/client_golang v1.16.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/xid v1.6.0
 	github.com/spf13/cobra v1.8.1
-	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.993
-	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dnspod v1.0.989
-	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/domain v1.0.993
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.3.24
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dnspod v1.3.24
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/domain v1.2.2
 	github.com/weppos/publicsuffix-go v0.40.2
 )
 
@@ -79,5 +77,4 @@ require (
 	golang.org/x/sys v0.23.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0
-
 )

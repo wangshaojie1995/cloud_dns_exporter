@@ -7,10 +7,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/dromara/carbon/v2"
 	"github.com/eryajf/cloud_dns_exporter/dnslib/dnsla"
 	"github.com/eryajf/cloud_dns_exporter/public"
 	"github.com/eryajf/cloud_dns_exporter/public/logger"
-	"github.com/golang-module/carbon/v2"
 )
 
 type DNSLaDNS struct {

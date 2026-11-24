@@ -1,13 +1,13 @@
-FROM registry.cn-hangzhou.aliyuncs.com/eryajf/golang:1.22.2-alpine3.19-eryajf  AS builder
+FROM docker.cnb.cool/znb/images/golang:1.25.0-alpine3.22  AS builder
 
 WORKDIR /app
 ENV GOPROXY="https://goproxy.io"
 
 ADD . .
 
-RUN make build-linux && upx -9 cloud_dns_exporter
+RUN apk add upx make && make build-linux && upx -9 cloud_dns_exporter
 
-FROM registry.cn-hangzhou.aliyuncs.com/eryajf/alpine:3.19
+FROM docker.cnb.cool/znb/images/alpine:3.22
 
 WORKDIR /app
 

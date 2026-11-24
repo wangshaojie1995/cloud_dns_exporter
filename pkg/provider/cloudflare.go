@@ -9,8 +9,8 @@ import (
 
 	"github.com/alibabacloud-go/tea/tea"
 	"github.com/cloudflare/cloudflare-go"
+	"github.com/dromara/carbon/v2"
 	"github.com/eryajf/cloud_dns_exporter/public"
-	"github.com/golang-module/carbon/v2"
 )
 
 type CloudFlareDNS struct {

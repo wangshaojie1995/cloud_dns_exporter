@@ -79,7 +79,7 @@ func GetCertInfo(record provider.GetRecordCertReq) (certInfo provider.RecordCert
 	if err != nil {
 		return certInfo, err
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 	certs := conn.ConnectionState().PeerCertificates
 	if len(certs) == 0 {
 		return certInfo, fmt.Errorf("未找到证书")
@@ -158,7 +158,7 @@ func isPortOpen(domain string) bool {
 	if err != nil {
 		return false
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 	return true
 }
 

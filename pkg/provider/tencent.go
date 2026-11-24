@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/alibabacloud-go/tea/tea"
+	"github.com/dromara/carbon/v2"
 	"github.com/eryajf/cloud_dns_exporter/public/logger"
-	"github.com/golang-module/carbon/v2"
 
 	"github.com/eryajf/cloud_dns_exporter/public"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"

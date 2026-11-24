@@ -15,22 +15,51 @@ import (
 
 // InitCron 初始化定时任务
 func InitCron() {
+	cronConfig := public.GetCronConfig()
 	c := cron.New(cron.WithSeconds())
-	_, _ = c.AddFunc("*/30 * * * * *", func() {
-		loading()
+
+	// 域名记录同步任务
+	domainRecordSyncSpec := convertSecondsToCron(cronConfig.DomainRecordSyncInterval)
+	_, _ = c.AddFunc(domainRecordSyncSpec, func() {
+		loadingDomainRecord()
 	})
-	loading()
-	_, _ = c.AddFunc("03 03 03 * * *", func() {
+	loadingDomainRecord() // 启动时立即执行一次
+
+	// 证书信息同步任务
+	certInfoSyncSpec := convertSecondsToCron(cronConfig.CertInfoSyncInterval)
+	_, _ = c.AddFunc(certInfoSyncSpec, func() {
 		loadingCert()
 		loadingCustomRecordCert()
 	})
-	loadingCert()
+	loadingCert() // 启动时立即执行一次
 	loadingCustomRecordCert()
 
 	c.Start()
+
+	logger.Info(fmt.Sprintf("Cron initialized - domain record sync: every %d seconds, cert info sync: every %d seconds",
+		cronConfig.DomainRecordSyncInterval, cronConfig.CertInfoSyncInterval))
 }
 
-func loading() {
+// convertSecondsToCron 将秒数转换为 cron 表达式
+func convertSecondsToCron(seconds int) string {
+	if seconds < 60 {
+		// 小于60秒：每N秒执行一次
+		return fmt.Sprintf("*/%d * * * * *", seconds)
+	} else if seconds < 3600 {
+		// 小于1小时：每N分钟执行一次
+		minutes := seconds / 60
+		return fmt.Sprintf("0 */%d * * * *", minutes)
+	} else if seconds < 86400 {
+		// 小于1天：每N小时执行一次
+		hours := seconds / 3600
+		return fmt.Sprintf("0 0 */%d * * *", hours)
+	} else {
+		// 大于等于1天：每天凌晨3点执行
+		return "0 0 3 * * *"
+	}
+}
+
+func loadingDomainRecord() {
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 
